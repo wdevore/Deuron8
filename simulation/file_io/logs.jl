@@ -65,6 +65,7 @@ end
 
 function close_logs(log::CoreInterfaces.ILog)
     close(log.appLog)
+    close(log.errLog)
 end
 
 end # End module -----------------

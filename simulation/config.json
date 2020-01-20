@@ -3,5 +3,5 @@
   "ErrLog": "../error.log",
   "AppLog": "../app.log",
   "ProgressLog": "../progress.log",
-  "ExitState": "Paused"
+  "ExitState": "Terminated"
 }

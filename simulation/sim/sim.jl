@@ -39,11 +39,21 @@ function entry()
 
         nothing
     catch ex
-        println("### Exception ###:\n", ex)
-        stacktrace(catch_backtrace())
-        Base.exit(3)
+        bt = catch_backtrace()
+        msg = sprint(showerror, ex, bt)
+
+        Logs.log_to_err(Deuron.core.logs, msg)
+
+        # Set flag and exit
+        Deuron.set_crashed()
+        exit()
+
+        # println("### Exception ###:\n", ex)
+        # stacktrace(catch_backtrace())
+        # Base.exit(3)
     end
 
+    # Not sure if this will ever trigger. TODO research...
     if trace ≠ nothing
         println(trace)
         println("\n################ Exception ####################")
@@ -62,6 +72,9 @@ function exit()
         Logs.log_to_app(Deuron.core.logs, "Suspending...", true)
         Logs.log_to_app(Deuron.core.logs, "Suspend complete", true)
         Config.set_exit_state(Deuron.core.config, "Paused")
+    elseif Deuron.crashed
+        Logs.log_to_app(Deuron.core.logs, "Crashed!!! See error.log", true)
+        Config.set_exit_state(Deuron.core.config, "Crashed")
     else
         msg = "Exiting..."
         Logs.log_to_app(Deuron.core.logs, msg, true)

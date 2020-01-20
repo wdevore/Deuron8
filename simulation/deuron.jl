@@ -24,6 +24,7 @@ stopped = false
 reset = false
 running = false
 suspended = false
+crashed = false
 
 function boot()
     println("--> Welcome to Deuron simulation <--")
@@ -134,6 +135,10 @@ end
 
 function stop()
     global running = false
+end
+
+function set_crashed()
+    global crashed = true
 end
 
 end # End module -------------------------------------
