@@ -7,7 +7,6 @@ using ..Logs
 
 # Main sim entry point
 function go()
-    
     trace = try
         if Config.exit_state(Deuron.core.config) == "Paused"
             Logs.log_to_app(Deuron.core.logs, "Simulation resuming", true)
@@ -55,7 +54,7 @@ function go()
 end
 
 function exit()
-    msg = "############################################"
+    msg = "============================================="
     Logs.log_to_app(Deuron.core.logs, msg, true)
     println("\n", msg)
 
@@ -65,6 +64,8 @@ function exit()
     
     # Do exit stuff
 
+    Deuron.stop()
+    
     msg = "Goodbye."
     Logs.log_to_app(Deuron.core.logs, msg, true)
 

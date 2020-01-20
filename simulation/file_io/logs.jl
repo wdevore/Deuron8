@@ -39,7 +39,7 @@ function configure(log::CoreInterfaces.ILog)
         log.appLog = open(Config.app_log(log.config), "w")
     end
 
-    log_to_app(log, "Log configured at ", true)
+    # log_to_app(log, "Log configured", true)
 end
 
 function log_to_app(log::CoreInterfaces.ILog, msg::String, stamp::Bool = false)
