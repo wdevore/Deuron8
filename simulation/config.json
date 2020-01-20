@@ -1,7 +1,7 @@
 {
-  "AppLog": "../app.log",
-  "ProgressLog": "../progress.log",
   "SimLog": "../sim.log",
   "ErrLog": "../error.log",
+  "AppLog": "../app.log",
+  "ProgressLog": "../progress.log",
   "ExitState": "Paused"
 }

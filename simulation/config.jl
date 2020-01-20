@@ -12,12 +12,14 @@ using ..CoreInterfaces
 #                if it was paused or terminated.
 # error.log    - Errors prior at the time of failures.
 
+CONFIG_FILE = "config.json"
+
 mutable struct SConfig <: CoreInterfaces.IConfig
     json::Dict{String,Any}
 
     function SConfig()
         o = new()
-        o.json = JSON.parsefile("config.json")
+        o.json = JSON.parsefile(CONFIG_FILE)
         o
     end
 end
@@ -35,14 +37,29 @@ function err_log(config::CoreInterfaces.IConfig)
     config.json["ErrLog"]
 end
 
+function save(config::CoreInterfaces.IConfig)
+    open(CONFIG_FILE, "w") do f
+        JSON.print(f, config.json, 2)
+    end
+end
+
+# -----------------------------------------------------------------
+# Set/Gets
+# -----------------------------------------------------------------
+
 # Indicates what the last state the simulation was in when deuron exited.
 # Values:
-#   Terminated => paused
+#   Terminated => user quit simulation while it was inprogress
 #   Completed = sim terminated on its own
 #   Crashed = sim died
-#   Paused
+#   Paused = user paused simulation
 function exit_state(config::CoreInterfaces.IConfig)
     config.json["ExitState"]
 end
+
+function set_exit_state(config::CoreInterfaces.IConfig, state::String)
+    config.json["ExitState"] = state
+end
+
 
 end # End module -----------------

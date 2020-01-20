@@ -6,7 +6,7 @@ using ..Config
 using ..Logs
 
 # Main sim entry point
-function go()
+function entry()
     trace = try
         if Config.exit_state(Deuron.core.config) == "Paused"
             Logs.log_to_app(Deuron.core.logs, "Simulation resuming", true)
@@ -17,7 +17,6 @@ function go()
         while true
             if !Deuron.paused
                 Logs.log_to_app(Deuron.core.logs, ".", true)
-                # print(".")
                 sleep(1)
             else
                 Logs.log_to_app(Deuron.core.logs, "--paused--", true)
@@ -58,14 +57,21 @@ function exit()
     Logs.log_to_app(Deuron.core.logs, msg, true)
     println("\n", msg)
 
-    msg = "Exiting..."
-    Logs.log_to_app(Deuron.core.logs, msg, true)
-    println(msg)
-    
     # Do exit stuff
+    if Deuron.suspended
+        Logs.log_to_app(Deuron.core.logs, "Suspending...", true)
+        Logs.log_to_app(Deuron.core.logs, "Suspend complete", true)
+        Config.set_exit_state(Deuron.core.config, "Paused")
+    else
+        msg = "Exiting..."
+        Logs.log_to_app(Deuron.core.logs, msg, true)
+        Config.set_exit_state(Deuron.core.config, "Terminated")
+    end
+
+    Config.save(Deuron.core.config)
 
     Deuron.stop()
-    
+
     msg = "Goodbye."
     Logs.log_to_app(Deuron.core.logs, msg, true)
 

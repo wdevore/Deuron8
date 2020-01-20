@@ -18,6 +18,7 @@ mutable struct SLog <: CoreInterfaces.ILog
     config::CoreInterfaces.IConfig
 
     appLog::IOStream
+    errLog::IOStream
     dtFormat::DateFormat
 
     function SLog(config::CoreInterfaces.IConfig)
@@ -39,6 +40,8 @@ function configure(log::CoreInterfaces.ILog)
         log.appLog = open(Config.app_log(log.config), "w")
     end
 
+    log.errLog = open(Config.err_log(log.config), "w")
+
     # log_to_app(log, "Log configured", true)
 end
 
@@ -49,6 +52,15 @@ function log_to_app(log::CoreInterfaces.ILog, msg::String, stamp::Bool = false)
 
     write(log.appLog, msg, "\n")
     flush(log.appLog)
+end
+
+function log_to_err(log::CoreInterfaces.ILog, msg::String, stamp::Bool = true)
+    if stamp
+        write(log.errLog, Dates.format(Dates.now(), log.dtFormat), " ")
+    end
+
+    write(log.errLog, msg, "\n")
+    flush(log.errLog)
 end
 
 function close_logs(log::CoreInterfaces.ILog)

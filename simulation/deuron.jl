@@ -15,35 +15,51 @@ include("./sim/sim.jl")
 
 core = Core()
 
+# A paused simulation means we can resume when we return to the App
+# A stopped simulation means the simulation starts fresh and ignores
+#   any previous state. Quiting while a simulation is running means
+#   we have stopped the simulation.
 paused = false
 stopped = false
 reset = false
 running = false
+suspended = false
 
 function boot()
-    println("Welcome to Deuron8")
+    println("--> Welcome to Deuron simulation <--")
     msg = string("Previous run state: ", Config.exit_state(Deuron.core.config))
     println(msg)
     print_help()
 
+    Logs.log_to_app(Deuron.core.logs, "", true)
     Logs.log_to_app(Deuron.core.logs, "---------------------------------------------", true)
     Logs.log_to_app(Deuron.core.logs, "******************* Ready *******************", true)
     Logs.log_to_app(Deuron.core.logs, "---------------------------------------------", true)
     Logs.log_to_app(Deuron.core.logs, msg, true)
 
     while true
-        input = readavailable(stdin)
         # println("input: ", input)
         
-        # Strip newline off
-        msg = String(input[1:length(input) - 1])
+        msg = get_input()
 
         if msg == "q"  # quit
-            if paused
-                Logs.log_to_app(Deuron.core.logs, "Stopping...", true)
+            if running && !paused
+                println("?? Simulation is running! Are you sure you want to stop and quit ??")
+                println("[y/n]?")
+                print(">")
+                msg = get_input()
+                if msg == "y"
+                    Logs.log_to_app(Deuron.core.logs, "Stopping...", true)
+                    global stopped = true
+                end
+            elseif paused
+                Logs.log_to_app(Deuron.core.logs, "Suspending...", true)
                 global stopped = true
+                global suspended = true
             else
-                println("** Pause sim first before quitting **")
+                Logs.log_to_app(Deuron.core.logs, "Quit", true)
+                println("Goodbye.")
+                Base.exit(0)
             end
         elseif msg == "r"   # run/start
             if running || paused
@@ -51,7 +67,7 @@ function boot()
             else
                 global paused = false
                 global running = true
-                @async Sim.go()
+                @async Sim.entry()
             end
         elseif msg == "p"   # pause
             if paused
@@ -84,21 +100,28 @@ function boot()
     end
 end
 
+function get_input()
+    input = readavailable(stdin)
+    # Strip newline off
+    String(input[1:length(input) - 1])
+end
+
 function print_help()
     # "r" either resumes any previous sim that was in progress or starts a new one.
     # The config file identifies which.
-
-    println("--------------------------------------------")
-    println("Commands:")
-    println("  q: quit")
-    println("  r: run simulation")
-    println("  p: pause simulation")
-    println("  u: resume simulation")
-    println("  s: reset simulation")
-    println("  a: status of simulation")
-    println("  h: this help menu")
-    println("--------------------------------------------")
-    print(">")
+    if !stopped
+        println("--------------------------------------------")
+        println("Commands:")
+        println("  q: quit")
+        println("  r: run simulation")
+        println("  p: pause simulation")
+        println("  u: resume simulation")
+        println("  s: reset simulation")
+        println("  a: status of simulation")
+        println("  h: this help menu")
+        println("--------------------------------------------")
+        print(">")
+    end
 end
 
 function resume()
