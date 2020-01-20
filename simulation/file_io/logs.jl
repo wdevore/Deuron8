@@ -1,7 +1,6 @@
 # ---------------------------------------------------
 module Logs
 # ---------------------------------------------------
-using JSON
 using Dates
 
 using ..CoreInterfaces
@@ -19,11 +18,13 @@ mutable struct SLog <: CoreInterfaces.ILog
     config::CoreInterfaces.IConfig
 
     appLog::IOStream
+    dtFormat::DateFormat
 
     function SLog(config::CoreInterfaces.IConfig)
         o = new()
         # println("Applog: ", Config.appLog(config))
-        o.start_time = Dates.format(Dates.now(), "Y-m-d HH:MM:SS")
+        o.dtFormat = dateformat"Y-mm-dd II:MM:SS"
+        o.start_time = Dates.format(Dates.now(), o.dtFormat)
         o.config = config
         o
     end
@@ -43,10 +44,11 @@ end
 
 function log_to_app(log::CoreInterfaces.ILog, msg::String, stamp::Bool = false)
     if stamp
-        write(log.appLog, log.start_time, " ")
+        write(log.appLog, Dates.format(Dates.now(), log.dtFormat), " ")
     end
 
     write(log.appLog, msg, "\n")
+    flush(log.appLog)
 end
 
 function close_logs(log::CoreInterfaces.ILog)

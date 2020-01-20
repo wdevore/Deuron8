@@ -3,7 +3,6 @@ module Config
 # ---------------------------------------------------
 using JSON
 
-# using ..Deuron
 using ..CoreInterfaces
 
 # Simulation writes to several files, not including the sim data files:
@@ -38,16 +37,12 @@ end
 
 # Indicates what the last state the simulation was in when deuron exited.
 # Values:
-#   Terminated
-#   Completed
-#   Crashed
+#   Terminated => paused
+#   Completed = sim terminated on its own
+#   Crashed = sim died
 #   Paused
 function exit_state(config::CoreInterfaces.IConfig)
     config.json["ExitState"]
 end
-
-# function exit_state(core::CoreInterfaces.ICore)
-#     Deuron.get_config(core).json["ExitState"]
-# end
 
 end # End module -----------------

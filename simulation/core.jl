@@ -14,7 +14,4 @@ mutable struct Core <: CoreInterfaces.ICore
     end
 end
 
-# function get_config(core::CoreInterfaces.ICore)
-#     core.config
-# end
 
